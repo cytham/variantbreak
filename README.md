@@ -59,6 +59,7 @@ write_to_files(df,
 | output.h5 | HDF5 file required for data visualization by VariantMap |
 | output.csv | CSV file for data viewing, separated by the delimiter set by user |
 | legend.txt | File containing the legend of the sample labels used in analysis|
+
 For more information, see [wiki](https://github.com/cytham/variantbreak/wiki).
 
 ### Operating system: 
