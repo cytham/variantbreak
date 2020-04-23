@@ -10,7 +10,6 @@ setup(
     name='variantbreak',
     version=__version__,
     packages=find_packages(),
-    include_package_data=True,
     scripts=['variantbreak/variantbreak'],
     url='https://github.com/cytham/variantbreak',
     download_url='https://github.com/cytham/variantbreak/releases',
