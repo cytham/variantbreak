@@ -1,0 +1,8 @@
+VariantBreak Changelog
+
+
+Release Summary:
+
+
+Version 1.0.0 - Apr 23, 2020
+    * First release

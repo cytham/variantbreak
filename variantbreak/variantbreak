@@ -1,0 +1,91 @@
+"""
+VariantBreak
+
+This is the main executable module of the program VariantBreak.
+
+Copyright (C) 2020 Tham Cheng Yong
+
+VariantBreak is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VariantBreak is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with VariantBreak.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
+from __future__ import absolute_import
+
+import os
+import sys
+import logging
+from datetime import datetime
+
+from variantbreak import variantbreak, input_parser, __version__, write_to_files
+
+
+def main():
+
+    # Parse arguments
+    args = input_parser()
+    v_file_dir = args.v_file_dir
+    wk_dir = args.wk_dir
+    a_file_dir = args.annotation_file_dir
+    f_file_dir = args.filter_file_dir
+    del_annotate_size = args.del_annotate_size
+    merge_buffer = args.merge_buffer
+    promoter_size = args.promoter_size
+    max_annotation = args.max_annotation
+    quiet = args.quiet
+    sep = args.sep
+    file_prefix = args.filename
+
+    # Setup up logging
+    log_file = os.path.join(wk_dir, 'VariantBreak-{:%d%m%y-%H%M}.log'.format(datetime.now()))
+    logging.basicConfig(filename=log_file, level=logging.DEBUG, format='[%(asctime)s] - %(levelname)s - %(message)s',
+                        datefmt='%d/%m/%Y %H:%M:%S')
+    logging.info('Initialize VariantBreak log file')
+    logging.info('Version: VariantBreak-%s' % __version__)
+    logging.info('Command: %s' % ' '.join(sys.argv))
+    logging.info('Working directory: %s' % wk_dir)
+    logging.info('Variant file or directory: %s' % v_file_dir)
+    logging.info('Annotation file or directory: %s' % a_file_dir)
+    logging.info('Filter file or directory: %s' % f_file_dir)
+    logging.info('Deletion size threshold for full annotation: %s' % str(del_annotate_size))
+    logging.info('Length buffer for SV breakend merging: %s' % str(merge_buffer))
+    logging.info('Upstream promoter size: %s' % str(promoter_size))
+    logging.info('Number of annotations to report per SV breakend: %s' % str(max_annotation))
+    logging.info('Separator for dataframe file: %s' % sep)
+    logging.info('Quiet: %s' % str(quiet))
+
+    # Run VariantBreak
+    df = variantbreak(
+        v_file_dir,
+        a_file_dir,
+        f_file_dir,
+        del_annotate_size,
+        merge_buffer,
+        promoter_size,
+        max_annotation,
+        quiet
+    )
+
+    # Write dataframe and its metadata to HDF5, CSV and dictionary legend files
+    print('Writing dataframe to file, please wait.')
+    logging.info('Writing dataframe to file')
+    write_to_files(df, os.path.join(wk_dir, file_prefix), sep=sep)
+
+    # Print end time
+    now = datetime.now()
+    now_str = now.strftime("[%d/%m/%Y %H:%M:%S]")
+    print(now_str, "- Finished")
+    logging.info('Finished')
+
+
+if __name__ == "__main__":
+    main()
