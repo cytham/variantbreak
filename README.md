@@ -1,5 +1,5 @@
 ## VariantBreak - Structural variant analyzer for data visualization on VariantMap
-[![Build Status](https://travis-ci.org/cytham/variantbreak.svg?branch=master)](https://travis-ci.com/cytham/variantbreak)
+[![Build Status](https://travis-ci.org/cytham/variantbreak.svg?branch=master)](https://travis-ci.org/cytham/variantbreak)
 [![Github release](https://img.shields.io/github/v/release/cytham/variantbreak?include_prereleases)](../../releases)
 
 
