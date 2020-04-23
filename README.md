@@ -78,7 +78,6 @@ Will be available on Bioconda and PyPI soon.
 * pybedtools >=0.8.1
 * pandas >=1.0.3
 
-Please make sure each executable binary is in PATH.
 ##### 1. _bedtools_
 Please visit [here](https://bedtools.readthedocs.io/en/latest/content/installation.html) for instructions to install.
 
