@@ -4,5 +4,14 @@ VariantBreak Changelog
 Release Summary:
 
 
+Version 1.0.1 - Apr 26, 2020
+    * Fixed duplicated sample ID bug for BNDs in variant_parse
+    * Added new dependency 'tables' for pandas hdf
+    * Added ';' at the end of gene names to mark thr end of string
+    * Added gene name check for ';' character
+    * Added logging.critical logging for Exceptions throughout package
+    * Fixed setup.py installation by changing version import approach
+
+
 Version 1.0.0 - Apr 23, 2020
     * First release

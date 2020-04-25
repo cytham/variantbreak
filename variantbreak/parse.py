@@ -81,11 +81,13 @@ def variant_parse(
                             end1 = info_dict['END']
                             sv_len = info_dict['SVLEN']
                         except KeyError:
+                            logging.critical("Error: Invalid INFO column in %s line %s." % (file_path, n))
                             raise Exception("Error: Invalid INFO column in %s line %s." % (file_path, n))
                         if sv_type == 'BND':
                             try:
                                 sv_subtype = info_dict['SV2']
                             except KeyError:
+                                logging.critical("Error: Invalid INFO column (SV2) in %s line %s." % (file_path, n))
                                 raise Exception("Error: Invalid INFO column (SV2) in %s line %s." % (file_path, n))
                             bnd_record = line.split('\t')[4]
                         else:
@@ -96,18 +98,18 @@ def variant_parse(
                         info_dict['AD'] = line.split('\t')[9].split(':')[2].strip()
                         if sv_type == 'DEL':
                             if int(info_dict['SVLEN'].strip('-')) <= del_annotate_size:  # if del size <= threshold
-                                bed.append(contig1 + '\t' + start1 + '\t' + end1 + '\t' + sample + '~' + sv_id)
+                                bed.append(contig1 + '\t' + start1 + '\t' + end1 + '\t' + sample + '~' + str(n))
                             else:  # if del size > threshold
-                                bed.append(contig1 + '\t' + start1 + '\t' + str(int(start1)+1) + '\t' + sample + '~' + sv_id)
-                                bed.append(contig1 + '\t' + end1 + '\t' + str(int(end1)+1) + '\t' + sample + '~' + sv_id)
+                                bed.append(contig1 + '\t' + start1 + '\t' + str(int(start1)+1) + '\t' + sample + '~' + str(n))
+                                bed.append(contig1 + '\t' + end1 + '\t' + str(int(end1)+1) + '\t' + sample + '~' + str(n))
                         elif sv_type in ['BND', 'INS']:
-                            bed.append(contig1 + '\t' + start1 + '\t' + end1 + '\t' + sample + '~' + sv_id)
+                            bed.append(contig1 + '\t' + start1 + '\t' + end1 + '\t' + sample + '~' + str(n))
                         elif sv_type in ['DUP', 'INV']:
-                            bed.append(contig1 + '\t' + start1 + '\t' + str(int(start1) + 1) + '\t' + sample + '~' + sv_id)
-                            bed.append(contig1 + '\t' + end1 + '\t' + str(int(end1) + 1) + '\t' + sample + '~' + sv_id)
-                        data_dict[sample + '~' + sv_id] = [sample, sv_type, sv_subtype, sv_len, bnd_record,
-                                                           score, sv_id, info_dict['GT'], info_dict['DP'],
-                                                           info_dict['AD']]
+                            bed.append(contig1 + '\t' + start1 + '\t' + str(int(start1) + 1) + '\t' + sample + '~' + str(n))
+                            bed.append(contig1 + '\t' + end1 + '\t' + str(int(end1) + 1) + '\t' + sample + '~' + str(n))
+                        data_dict[sample + '~' + str(n)] = [sample, sv_type, sv_subtype, sv_len, bnd_record,
+                                                            score, sv_id, info_dict['GT'], info_dict['DP'],
+                                                            info_dict['AD']]
             # Create BedTool object
             bed_class = BedTool('\n'.join(bed) + '\n', from_string=True)
         elif file_path.endswith('.bed'):
@@ -140,7 +142,7 @@ def variant_parse(
                 gene_id = line[7].split('/')[0]
                 header_dict['Gene_id'][line[3]].append(gene_id)
                 header_dict['Transcript_id'][line[3]].append(line[7].split('/')[1])
-                header_dict['Gene_name'][line[3]].append(gene_info_dict[gene_id].split('/')[0])
+                header_dict['Gene_name'][line[3]].append(gene_info_dict[gene_id].split('/')[0] + ';')
                 header_dict['Gene_type'][line[3]].append(gene_info_dict[gene_id].split('/')[1])
                 header_dict['Gene_feature'][line[3]].append(line[7].split('/')[2])
                 header_dict['Feature_no'][line[3]].append(line[7].split('/')[3])
@@ -198,7 +200,7 @@ def variant_parse(
                         annote.append(','.join(list(set(header_dict['Gene_name'][sv[3]]))[0:no_annotate_cap]))
                     else:
                         annote.append(','.join(list(set(header_dict[label][sv[3]]))[0:no_annotate_cap]))
-                annote = ', '.join(annote).strip(', ')
+                annote = ', '.join(annote).strip(', ').replace(';', '')
                 _filter = []
                 for filt in filter_dict:
                     if header_dict[filt][sv[3]] == ['1']:
@@ -277,6 +279,7 @@ def annotation_parse(
         elif file_path.endswith('.bed'):
             file_type = 'bed'
         else:
+            logging.critical('Error: Invalid file extension %s' % file_path)
             raise Exception('Error: Invalid file extension %s' % file_path)
         if file_type in ['gff', 'gtf']:
             with open(file_path) as f:
@@ -301,6 +304,7 @@ def annotation_parse(
                             try:
                                 gene_id = info_dict['gene_id']
                             except KeyError:
+                                logging.critical('Error: File %s is missing gene_id at line %i' % (file_path, n))
                                 raise Exception('Error: File %s is missing gene_id at line %i' % (file_path, n))
                             try:
                                 gene_type = info_dict['gene_type']
@@ -308,12 +312,20 @@ def annotation_parse(
                                 try:
                                     gene_type = info_dict['gene_biotype']
                                 except KeyError:
+                                    logging.critical('Error: File %s is missing gene_type or gene_biotype at line %i' %
+                                                     (file_path, n))
                                     raise Exception('Error: File %s is missing gene_type or gene_biotype at line %i' %
                                                     (file_path, n))
                             total_gene_types.add(gene_type)
                             try:
                                 gene_name = info_dict['gene_name']
+                                if ';' in gene_name:
+                                    logging.critical("Error: Gene name %s contains ';' character, please raise an issue on "
+                                                     "GitHub." % gene_name)
+                                    raise Exception("Error: Gene name %s contains ';' character, please raise an issue on "
+                                                    "GitHub." % gene_name)
                             except KeyError:
+                                logging.critical('Error: File %s is missing gene_name at line %i' % (file_path, n))
                                 raise Exception('Error: File %s is missing gene_name at line %i' % (file_path, n))
                             if strand == '+':
                                 bed.append(contig + '\t' + str(max(int(start) - promoter_size, 0)) + '\t' +
@@ -340,6 +352,7 @@ def annotation_parse(
                             try:
                                 transcript_id = info_dict['transcript_id']
                             except KeyError:
+                                logging.critical('Error: File %s is missing transcript_id at line %i' % (file_path, n))
                                 raise KeyError('Error: File %s is missing transcript_id at line %i' % (file_path, n))
                         elif feature == 'exon':
                             start = line.split('\t')[3]
@@ -360,6 +373,7 @@ def annotation_parse(
                             try:
                                 exon_no = info_dict['exon_number']
                             except KeyError:
+                                logging.critical('Error: File %s is missing exon_number at line %i' % (file_path, n))
                                 raise KeyError('Error: File %s is missing exon_number at line %i' % (file_path, n))
                             bed.append(contig + '\t' + start + '\t' + end + '\t' + gene_id + '/' + transcript_id + '/' + feature
                                        + '/exon' + exon_no)
@@ -396,7 +410,7 @@ def annotation_parse(
             bed_class = bed_class.sort()
             annotation_name = 'GTF'
             # Look for gene types used in VariantMap
-            vm_gene_types = set(['protein_coding', 'lncRNA', 'miRNA', 'snRNA', 'snoRNA'])
+            vm_gene_types = {'protein_coding', 'lncRNA', 'miRNA', 'snRNA', 'snoRNA'}
             missing_types = vm_gene_types.difference(total_gene_types)
             if len(missing_types) > 0:
                 logging.warning("WARNING: GTF/GFF file missing common gene types such as %s." % ', '.join(list(missing_types)))
@@ -424,6 +438,8 @@ def annotation_parse(
                     n += 1
                     if not line.startswith('#'):
                         if len(line.split('\t')) < 4:
+                            logging.critical('Error: BED annotation file %s is missing label column on line %s' % (file_path,
+                                                                                                                   str(n)))
                             raise Exception('Error: BED annotation file %s is missing label column on line %s' % (file_path,
                                                                                                                   str(n)))
             bed_class = BedTool(file_path)

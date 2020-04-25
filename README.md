@@ -3,13 +3,13 @@
 [![Github release](https://img.shields.io/github/v/release/cytham/variantbreak?include_prereleases)](../../releases)
 
 
-VariantBreak is a python package that integrates all structural variants (SVs) from a cohort of NanoVar VCF files or variant BED 
-files for visualization on VariantMap or summarized into a CSV file. It also annotates and filters all SVs across all samples 
-according to user input GTF/GFF/BED files. 
+VariantBreak is a python package that integrates all structural variants (SVs) from a cohort of 
+[NanoVar](https://github.com/cytham/nanovar) VCF files or variant BED files for visualization on VariantMap or summarized into a 
+CSV file. It also annotates and filters all SVs across all samples according to user input GTF/GFF/BED files. 
 
 ### Basic capabilities
-* Intersects and merges all SV breakends from a sample cohort using NanoVar VCF files (NanoVar-v1.3.6 or above) or variant BED
- files.
+* Intersects and merges all SV breakends from a sample cohort using [NanoVar](https://github.com/cytham/nanovar) VCF files 
+(NanoVar-v1.3.6 or above) or variant BED files.
 * Annotates each SV according to input GTF/GFF files or BED annotation files.
 * Filters SVs by adding a "HIT" or "MISS" label according to input BED filter files.
 * Creates a master pandas dataframe to store all data. 
@@ -77,6 +77,7 @@ Will be available on Bioconda and PyPI soon.
 * bedtools >=2.26.0 (required to be in PATH by pybedtools)
 * pybedtools >=0.8.1
 * pandas >=1.0.3
+* tables >=3.6.1
 
 ##### 1. _bedtools_
 Please visit [here](https://bedtools.readthedocs.io/en/latest/content/installation.html) for instructions to install.
@@ -87,6 +88,15 @@ Please visit [here](https://daler.github.io/pybedtools/main.html) for instructio
 ##### 3. _pandas_
 Please visit [here](https://pandas.pydata.org/pandas-docs/stable/getting_started/install.html) for instructions to install.
 
+##### 4. _tables_
+```
+pip install tables
+```
+or
+```
+conda install -c conda-forge pytables
+```
+
 ## Documentation
 See [wiki](https://github.com/cytham/variantbreak/wiki) for more information.
 
@@ -94,7 +104,7 @@ See [wiki](https://github.com/cytham/variantbreak/wiki) for more information.
 See [CHANGELOG](./CHANGELOG.txt)
 
 ## Citation
-Coming soon
+Not available
 
 ## Author
 

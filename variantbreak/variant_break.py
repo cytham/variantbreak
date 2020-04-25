@@ -148,7 +148,7 @@ def write_to_files(df, file_path, sep=','):
 
     # Save dataframe and metadata to HDF5
     filename, _ = os.path.splitext(file_path)
-    store = pd.HDFStore(filename + '.h5')
+    store = pd.HDFStore(filename + '.h5', mode='w')
     store.put('dataset', df)
     metadata = df.metadata
     store.get_storer('dataset').attrs.metadata = metadata
