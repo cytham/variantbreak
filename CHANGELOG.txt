@@ -4,6 +4,10 @@ VariantBreak Changelog
 Release Summary:
 
 
+Version 1.0.2 - Apr 30, 2020
+    * Changed SV class labels in output.csv file instead of decimal representation
+
+
 Version 1.0.1 - Apr 26, 2020
     * Fixed duplicated sample ID bug for BNDs in variant_parse
     * Added new dependency 'tables' for pandas hdf
