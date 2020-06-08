@@ -42,6 +42,8 @@ def main():
     merge_buffer = args.merge_buffer
     promoter_size = args.promoter_size
     max_annotation = args.max_annotation
+    cluster_sample = args.cluster_sample
+    auto_filter = args.auto_filter
     quiet = args.quiet
     sep = args.sep
     file_prefix = args.filename
@@ -73,6 +75,8 @@ def main():
         merge_buffer,
         promoter_size,
         max_annotation,
+        cluster_sample,
+        auto_filter,
         quiet
     )
 

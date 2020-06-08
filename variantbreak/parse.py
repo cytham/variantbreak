@@ -28,6 +28,7 @@ from collections import defaultdict, OrderedDict
 from pybedtools import BedTool
 import pandas as pd
 import numpy as np
+import fastcluster
 
 
 def variant_parse(
@@ -39,7 +40,9 @@ def variant_parse(
         label_col,
         filter_dict,
         filter_col,
-        no_annotate_cap
+        no_annotate_cap,
+        cluster_sample,
+        auto_filter
 ):
     """Returns a variant dataframe and a dictionary of sample names to file path.
     """
@@ -182,12 +185,12 @@ def variant_parse(
         tmp = {}
         _df = pd.DataFrame(dummy_list, index=[sv_name], columns=sample_index_list)
         sv = list(sv)
-        for _id in sv[3].split(','):
+        for _id in sv[3].split(','):  # If two or more breakends come from the same sample, the last breakend will be included.
             _df.at[sv_name, data_dict[_id.strip()][0]] = sv_type_dict[data_dict[_id.strip()][1]]  # Update internal df
             sv_type.append(data_dict[_id.strip()][1])
             tmp[data_dict[_id.strip()][0]] = data_dict[_id.strip()]
         for header in label_col + filter_col:
-            header_list[header].append(', '.join(list(set(header_dict[header][sv[3]]))[0:no_annotate_cap]))
+            header_list[header].append('/'.join(list(set(header_dict[header][sv[3]]))[0:no_annotate_cap]))
         df = pd.concat([df, _df])  # Update main df
         sv_type = '/'.join(sorted(set(sv_type)))
         rank = 0
@@ -197,10 +200,10 @@ def variant_parse(
                 annote = []
                 for label in annotation_dict:
                     if label == 'GTF':
-                        annote.append(','.join(list(set(header_dict['Gene_name'][sv[3]]))[0:no_annotate_cap]))
+                        annote.append('/'.join(list(set(header_dict['Gene_name'][sv[3]]))[0:no_annotate_cap]))
                     else:
-                        annote.append(','.join(list(set(header_dict[label][sv[3]]))[0:no_annotate_cap]))
-                annote = ', '.join(annote).strip(', ').replace(';', '')
+                        annote.append('/'.join(list(set(header_dict[label][sv[3]]))[0:no_annotate_cap]))
+                annote = '/ '.join(annote).strip(', ').replace(';', '')
                 _filter = []
                 for filt in filter_dict:
                     if header_dict[filt][sv[3]] == ['1']:
@@ -227,11 +230,53 @@ def variant_parse(
         if c % 10000 == 0:
             print('Processed %i merged SV entries' % c)
             logging.info('Processed %i merged SV entries' % c)
+
     for header in header_list:
         df[header] = header_list[header]
 
+    # Auto Filter out variants intersecting with filter files
+    if auto_filter:
+        for filt in filter_dict:
+            df = df[df[filt] != '1']
+
+    # Obtain clustered reordered sample list
+    if cluster_sample:
+        # Create numpy array for selected samples
+        arr = df.loc[:, sample_index_list].values
+        # Change all SV hits to value of 1
+        arr[arr != 0] = 1
+        # Change astype to int
+        arr = arr.astype(int)
+        # Transpose array
+        arr = np.transpose(arr)
+        # Linkage
+        z = fastcluster.linkage(arr, 'ward')
+        # Get reordered indices
+        n = len(z) + 1
+        cache = dict()
+        for k in range(len(z)):
+            c1, c2 = int(z[k][0]), int(z[k][1])
+            c1 = [c1] if c1 < n else cache.pop(c1)
+            c2 = [c2] if c2 < n else cache.pop(c2)
+            cache[n + k] = c1 + c2
+        index = cache[2 * len(z)]
+        clustered_sample = []
+        for i in index:
+            clustered_sample.append(sample_index_list[i])
+        # Combined new sample order with the rest of column labels
+        total_clustered_sample = clustered_sample + [i for i in df.columns if i not in clustered_sample]
+    else:
+        clustered_sample = sample_index_list
+        total_clustered_sample = df.columns.to_list()
+
+    # Reorder sample columns
+    df = df.reindex(columns=total_clustered_sample)
+
+    # # Rough sorting main dataframe
+    # df.sort_values(by=[sample], inplace=True, ascending=False)
+
     # Make new copy of df for sample columns
-    df_rank = df[sample_index_list].copy()
+    df_rank = df[clustered_sample].copy()
 
     # Change all non-zero values to 1
     df_rank[df_rank != 0] = 1
@@ -242,16 +287,43 @@ def variant_parse(
     # Add rank list to main df
     df['Rank'] = rank
 
-    # Sort df by rank in decending order
-    df_sort = df.sort_values(by=['Rank'], ascending=False)
+    # Add sample column binaries to dataframe
+    for n in range(len(df_rank.columns)):
+        df[str(n)] = df_rank[df_rank.columns[n]]
+
+    # Sort by sample binaries
+    for n in range(len(df_rank.columns)):
+        df.sort_values(by=[str(n)], ascending=False, inplace=True)
+
+    # Sort by rank
+    df.sort_values(by=['Rank'], ascending=False, inplace=True)
+
+    # Convert to 2D array
+    arr = df[[str(x) for x in range(len(df_rank.columns))]].values
+
+    # Group similar rows
+    c = 1
+    cls_dict = {}
+    cluster_grp = []
+    for i in arr:
+        if str(i) not in cls_dict:
+            cls_dict[str(i)] = c
+            c += 1
+        cluster_grp.append(cls_dict[str(i)])
+
+    # Add group list to main df
+    df['Cluster'] = cluster_grp
+
+    # Sort by cluster
+    df.sort_values(by=["Cluster"], ascending=True, inplace=True)
+
+    # Delete sample binary columns
+    df.drop(columns=[str(x) for x in range(len(df_rank.columns))], inplace=True)
 
     # Replace all nan with blank strings
-    df_sort.replace(np.nan, '', inplace=True)
+    df.replace(np.nan, '', inplace=True)
 
-    # Map hover data to df
-    # df_sort['Hover'] = df_sort.index.to_series().map(hover_dict)
-
-    return df_sort, sample_name_dict
+    return df, sample_name_dict
 
 
 def annotation_parse(

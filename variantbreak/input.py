@@ -87,8 +87,8 @@ the value to be set is an absolute deletion size, do not use minus
 deleted regions despite of size. [20000]""")
 
     parser.add_argument("-b", "--merge_buffer", type=int, metavar="int",
-                        default=50,
-                        help="""nucleotide length buffer for SV breakend clustering [50]""")
+                        default=400,
+                        help="""nucleotide length buffer for SV breakend clustering [400]""")
 
     parser.add_argument("-p", "--promoter_size", type=int, metavar="int",
                         default=1000,
@@ -99,6 +99,13 @@ deleted regions despite of size. [20000]""")
                         default=3,
                         help="""maximum number of annotation entries to be recorded in the 
 dataframe for each SV [3]]""")
+
+    parser.add_argument("--cluster_sample", action='store_true',
+                        help="performs hierarchical clustering on samples")
+
+    parser.add_argument("--auto_filter", action='store_true',
+                        help="""automatically removes variants that intersected
+with all filter BED files""")
 
     parser.add_argument("-s", "--sep", type=one_character, metavar="str",
                         default=',',

@@ -22,7 +22,7 @@ setup(
               'variantmap', 'filter'],
     long_description=long_description,
     long_description_content_type="text/markdown",
-    install_requires=['pybedtools>=0.8.0', 'pandas>=1.0.3', 'tables>=3.6.1'],
+    install_requires=['pybedtools>=0.8.0', 'pandas>=1.0.3', 'tables>=3.6.1', 'fastcluster>=1.1.26'],
     python_requires='>=3.6',
     classifiers=[
         "Operating System :: POSIX :: Linux",

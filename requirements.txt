@@ -1,3 +1,4 @@
+fastcluster==1.1.26
 numexpr==2.7.1
 numpy==1.18.3
 pandas==1.0.3

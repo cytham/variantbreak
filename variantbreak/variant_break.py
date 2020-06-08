@@ -41,6 +41,8 @@ def variantbreak(
         merge_buffer=50,
         promoter_size=1000,
         max_annotation=3,
+        cluster_sample=False,
+        auto_filter=False,
         quiet=False
 ):
     """ Returns a dataframe with metadata
@@ -65,6 +67,9 @@ def variantbreak(
 - promoter_size (int; default 1000): Length in base-pairs upstream of TSS to define promoter region
 - max_annotation (int; default 3): Maximum number of annotation entries to be recorded in the
     dataframe for each SV
+- cluster_sample (bool; default False): If True, performs hierarchical clustering on samples.
+- auto_filter (bool; default False): If True, automatically removes variants that intersected
+    with all filter BED files.
 - quiet (bool; default False): Hide verbose if True.
 
 
@@ -126,7 +131,10 @@ legend.txt - File containing the legend of the sample labels used in the datafra
                                          label_col,
                                          filter_dict,
                                          filter_col,
-                                         max_annotation)
+                                         max_annotation,
+                                         cluster_sample,
+                                         auto_filter
+                                         )
 
     # Gather sample labels
     sample_names = [x for x in sample_name_dict.keys()]
@@ -147,7 +155,7 @@ legend.txt - File containing the legend of the sample labels used in the datafra
 def write_to_files(df, file_path, sep=','):
 
     # Save dataframe and metadata to HDF5
-    filename, _ = os.path.splitext(file_path)
+    filename = file_path  # , _ = os.path.splitext(file_path)
     store = pd.HDFStore(filename + '.h5', mode='w')
     store.put('dataset', df)
     metadata = df.metadata

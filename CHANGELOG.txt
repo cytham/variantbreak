@@ -4,8 +4,16 @@ VariantBreak Changelog
 Release Summary:
 
 
+Version 1.0.3 - 8 June, 2020
+    * Changed default '--merged_buffer' value from 50 to 400
+    * Changed gene name and gene type dividers from ',' to '/' to avoid delimiter confusing
+    * Variants are now NOT sorted by prevalence, instead, it is clustered by hierarchical clustering
+    * Added option '--cluster_sample' for hierarchical clustering of sample order
+    * Added option '--auto_filter' for automatic removal of variants intersected with filter files instead of just labeling them
+
+
 Version 1.0.2 - Apr 30, 2020
-    * Changed SV class labels in output.csv file instead of decimal representation
+    * Changed SV classes to actual class labels in output.csv file instead of decimal representation
 
 
 Version 1.0.1 - Apr 26, 2020
