@@ -1,5 +1,5 @@
 ## VariantBreak - Structural variant analyzer for data visualization on VariantMap
-[![Build Status](https://travis-ci.org/cytham/variantbreak.svg?branch=master)](https://travis-ci.org/cytham/variantbreak)
+[![Build Status](https://travis-ci.com/cytham/variantbreak.svg?branch=master)](https://travis-ci.com/cytham/variantbreak)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/variantbreak)](https://pypi.org/project/variantbreak/)
 [![PyPI versions](https://img.shields.io/pypi/v/variantbreak)](https://pypi.org/project/variantbreak/)
 [![Conda](https://img.shields.io/conda/v/bioconda/variantbreak)](https://anaconda.org/bioconda/variantbreak)
