@@ -173,7 +173,7 @@ def variant_parse(
     dummy_list = [[0.0 for _ in range(len(sample_index_list))]]
     df = pd.DataFrame(columns=sample_index_list)
     sv_type_dict = {'DEL': 0.214, 'INV': 0.357, 'INS': 0.500, 'BND': 0.643, 'DUP': 0.786, 'UKN': 0.929}
-    header_list = {}
+    header_list = {'Chr': [], 'Start': [], 'End': []}
     for header in label_col + filter_col:
         header_list[header] = []
     for sample in sample_index_list:
@@ -189,6 +189,9 @@ def variant_parse(
             _df.at[sv_name, data_dict[_id.strip()][0]] = sv_type_dict[data_dict[_id.strip()][1]]  # Update internal df
             sv_type.append(data_dict[_id.strip()][1])
             tmp[data_dict[_id.strip()][0]] = data_dict[_id.strip()]
+        header_list['Chr'].append(sv[0])
+        header_list['Start'].append(sv[1])
+        header_list['End'].append(sv[2])
         for header in label_col + filter_col:
             header_list[header].append('/'.join(list(set(header_dict[header][sv[3]]))[0:no_annotate_cap]))
         df = pd.concat([df, _df])  # Update main df
@@ -203,7 +206,8 @@ def variant_parse(
                         annote.append('/'.join(list(set(header_dict['Gene_name'][sv[3]]))[0:no_annotate_cap]))
                     else:
                         annote.append('/'.join(list(set(header_dict[label][sv[3]]))[0:no_annotate_cap]))
-                annote = '/ '.join(annote).strip(', ').replace(';', '')
+                annote = [g for g in annote if g != '']
+                annote = '/'.join(annote).strip(', ').replace(';', '')
                 _filter = []
                 for filt in filter_dict:
                     if header_dict[filt][sv[3]] == ['1']:

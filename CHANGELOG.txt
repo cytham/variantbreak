@@ -4,7 +4,15 @@ VariantBreak Changelog
 Release Summary:
 
 
-Version 1.0.3 - 8 June, 2020
+Version 1.0.4 - Nov 25, 2020
+    * Add badges in README.md
+    * Correct typo in input.py (max_annotation)
+    * Added Index column label for CSV file
+    * Added Chr, Start, and End columns for SV coordinates
+    * Removed spaces and extra '/' in "Annotation" of hovers
+
+
+Version 1.0.3 - June 8, 2020
     * Changed default '--merged_buffer' value from 50 to 400
     * Changed gene name and gene type dividers from ',' to '/' to avoid delimiter confusing
     * Variants are now NOT sorted by prevalence, instead, it is clustered by hierarchical clustering

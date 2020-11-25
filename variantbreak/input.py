@@ -98,7 +98,7 @@ deleted regions despite of size. [20000]""")
     parser.add_argument("-m", "--max_annotation", type=int, metavar="int",
                         default=3,
                         help="""maximum number of annotation entries to be recorded in the 
-dataframe for each SV [3]]""")
+dataframe for each SV [3]""")
 
     parser.add_argument("--cluster_sample", action='store_true',
                         help="performs hierarchical clustering on samples")

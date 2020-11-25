@@ -1,11 +1,15 @@
 ## VariantBreak - Structural variant analyzer for data visualization on VariantMap
 [![Build Status](https://travis-ci.org/cytham/variantbreak.svg?branch=master)](https://travis-ci.org/cytham/variantbreak)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/variantbreak)](https://pypi.org/project/variantbreak/)
+[![PyPI versions](https://img.shields.io/pypi/v/variantbreak)](https://pypi.org/project/variantbreak/)
+[![Conda](https://img.shields.io/conda/v/bioconda/variantbreak)](https://anaconda.org/bioconda/variantbreak)
 [![Github release](https://img.shields.io/github/v/release/cytham/variantbreak?include_prereleases)](../../releases)
-
+[![PyPI license](https://img.shields.io/pypi/l/variantbreak)](./LICENSE.txt)
 
 VariantBreak is a python package that integrates all structural variants (SVs) from a cohort of 
-[NanoVar](https://github.com/cytham/nanovar) VCF files or variant BED files for visualization on VariantMap or summarized into a 
-CSV file. It also annotates and filters all SVs across all samples according to user input GTF/GFF/BED files. 
+[NanoVar](https://github.com/cytham/nanovar) VCF files or variant BED files for visualization on [VariantMap](https://github
+.com/cytham/variantmap) or summarized into a CSV file. It also annotates and filters all SVs across all samples according to
+ user input GTF/GFF/BED files. 
 
 ### Basic capabilities
 * Intersects and merges all SV breakends from a sample cohort using [NanoVar](https://github.com/cytham/nanovar) VCF files 

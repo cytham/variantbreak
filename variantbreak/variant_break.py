@@ -167,7 +167,7 @@ def write_to_files(df, file_path, sep=','):
     for name in metadata['sample_names']:
         df2[name].replace({0.0: "-", 0.214: "DEL", 0.357: "INV", 0.500: "INS", 0.643: "BND", 0.786: "DUP", 0.929: "UKN"},
                           inplace=True)
-    df2.to_csv(filename + '.csv', index=True, sep=sep)
+    df2.to_csv(filename + '.csv', index=True, sep=sep, index_label='Index')
 
     # Save label names to file_path in a legend text file for variant and filter files
     w = open(os.path.join(os.path.dirname(filename), 'legend.txt'), 'w')
