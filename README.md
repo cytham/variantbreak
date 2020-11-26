@@ -7,8 +7,7 @@
 [![PyPI license](https://img.shields.io/pypi/l/variantbreak)](./LICENSE.txt)
 
 VariantBreak is a python package that integrates all structural variants (SVs) from a cohort of 
-[NanoVar](https://github.com/cytham/nanovar) VCF files or variant BED files for visualization on [VariantMap](https://github
-.com/cytham/variantmap) or summarized into a CSV file. It also annotates and filters all SVs across all samples according to
+[NanoVar](https://github.com/cytham/nanovar) VCF files or variant BED files for visualization on [VariantMap](https://github.com/cytham/variantmap) or summarized into a CSV file. It also annotates and filters all SVs across all samples according to
  user input GTF/GFF/BED files. 
 
 ### Basic capabilities
