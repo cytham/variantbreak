@@ -6,6 +6,7 @@ Release Summary:
 
 Version 1.0.5 - Oct ?, 2021
     * Add TE option from NanoVar 1.4.0
+    * Add working directory setup
 
 
 Version 1.0.4 - Nov 25, 2020
