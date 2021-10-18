@@ -4,6 +4,10 @@ VariantBreak Changelog
 Release Summary:
 
 
+Version 1.0.5 - Oct ?, 2021
+    * Add TE option from NanoVar 1.4.0
+
+
 Version 1.0.4 - Nov 25, 2020
     * Add badges in README.md
     * Correct typo in input.py (max_annotation)
