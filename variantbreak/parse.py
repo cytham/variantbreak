@@ -96,6 +96,10 @@ def variant_parse(
                         else:
                             sv_subtype = '-'
                             bnd_record = '-'
+                        try:
+                            te = info_dict['TE']
+                        except KeyError:
+                            te = '-'
                         info_dict['GT'] = line.split('\t')[9].split(':')[0]
                         info_dict['DP'] = line.split('\t')[9].split(':')[1]
                         info_dict['AD'] = line.split('\t')[9].split(':')[2].strip()
@@ -112,7 +116,7 @@ def variant_parse(
                             bed.append(contig1 + '\t' + end1 + '\t' + str(int(end1) + 1) + '\t' + sample + '~' + str(n))
                         data_dict[sample + '~' + str(n)] = [sample, sv_type, sv_subtype, sv_len, bnd_record,
                                                             score, sv_id, info_dict['GT'], info_dict['DP'],
-                                                            info_dict['AD']]
+                                                            info_dict['AD'], te]
             # Create BedTool object
             bed_class = BedTool('\n'.join(bed) + '\n', from_string=True)
         elif file_path.endswith('.bed'):
@@ -219,11 +223,11 @@ def variant_parse(
                     header_list['Hover_' + sample].append('Index: %s<br>SV type: %s<br>Region: %s<br>Annotation: %s<br>'
                                                           '%s<br><br>Sample: %s<br>SV_type: %s<br>SV_subtype: %s<br>'
                                                           'SV_size: %s<br>BND_rec: %s<br>Score: %s<br>SV_id: %s<br>GT: '
-                                                          '%s<br>DP: %s<br>AD: %s' %
+                                                          '%s<br>DP: %s<br>AD: %s<br>TE: %s' %
                                                           (sv_name, sv_type, sv[0] + ':' + sv[1] + '-' + sv[2], annote,
                                                            _filter, sample, tmp[sample][1], tmp[sample][2], tmp[sample][3],
                                                            tmp[sample][4], tmp[sample][5], tmp[sample][6], tmp[sample][7],
-                                                           tmp[sample][8], tmp[sample][9]))
+                                                           tmp[sample][8], tmp[sample][9], tmp[sample][10]))
                 except IndexError:
                     header_list['Hover_' + sample].append('Index: %s<br>SV type: %s<br>Region: %s<br>Annotation: %s<br>'
                                                           '%s<br><br>Sample: %s<br>SV_type: %s' %
