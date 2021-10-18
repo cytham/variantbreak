@@ -47,6 +47,10 @@ def main():
     quiet = args.quiet
     sep = args.sep
     file_prefix = args.filename
+    
+    # Setup working directory
+    if not os.path.exists(wk_dir):
+        os.makedirs(wk_dir)
 
     # Setup up logging
     log_file = os.path.join(wk_dir, 'VariantBreak-{:%d%m%y-%H%M}.log'.format(datetime.now()))
