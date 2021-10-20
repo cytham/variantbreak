@@ -216,7 +216,10 @@ def variant_parse(
         header_list['Start'].append(sv[1])
         header_list['End'].append(sv[2])
         for header in label_col + filter_col:
-            header_list[header].append('/'.join(list(set(header_dict[header][sv[3][:20]]))[0:no_annotate_cap]))
+            try:
+                header_list[header].append('/'.join(list(set(header_dict[header][sv[3][:20]]))[0:no_annotate_cap]))
+            except KeyError:
+                header_list[header].append('')
         df = pd.concat([df, _df])  # Update main df
         sv_type = '/'.join(sorted(set(sv_type)))
         rank = 0
@@ -226,9 +229,15 @@ def variant_parse(
                 annote = []
                 for label in annotation_dict:
                     if label == 'GTF':
-                        annote.append('/'.join(list(set(header_dict['Gene_name'][sv[3][:20]]))[0:no_annotate_cap]))
+                        try:
+                            annote.append('/'.join(list(set(header_dict['Gene_name'][sv[3][:20]]))[0:no_annotate_cap]))
+                        except KeyError:
+                            annote.append('')
                     else:
-                        annote.append('/'.join(list(set(header_dict[label][sv[3][:20]]))[0:no_annotate_cap]))
+                        try:
+                            annote.append('/'.join(list(set(header_dict[label][sv[3][:20]]))[0:no_annotate_cap]))
+                        except KeyError:
+                            annote.append('')
                 annote = [g for g in annote if g != '']
                 annote = '/'.join(annote).strip(', ').replace(';', '')
                 _filter = []
