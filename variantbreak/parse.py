@@ -242,9 +242,12 @@ def variant_parse(
                 annote = '/'.join(annote).strip(', ').replace(';', '')
                 _filter = []
                 for filt in filter_dict:
-                    if header_dict[filt][sv[3][:20]] == ['1']:
-                        _filter.append(filt + ': HIT')
-                    else:
+                    try:
+                        if header_dict[filt][sv[3][:20]] == ['1']:
+                            _filter.append(filt + ': HIT')
+                        else:
+                            _filter.append(filt + ': MISS')
+                    except KeyError:
                         _filter.append(filt + ': MISS')
                 _filter = '; '.join(_filter)
                 try:
