@@ -173,7 +173,11 @@ def variant_parse(
             _intersect = merged_bed.intersect(annotation_dict[label], wa=True, wb=True)
             for line in _intersect:
                 line = list(line)
-                header_dict[label][line[3][:20]].append(line[7])
+                if line[3][:20] not in header_dict[label]:
+                    header_dict[label][line[3][:20]] = []
+                    header_dict[label][line[3][:20]].append(line[7])
+                else:
+                    header_dict[label][line[3][:20]].append(line[7])
 
     # Filter merged bed
     print('Filtering merged variants')
