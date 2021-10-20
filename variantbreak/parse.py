@@ -23,7 +23,7 @@ from __future__ import absolute_import
 
 import os
 import logging
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict  #, defaultdict
 
 from pybedtools import BedTool
 import pandas as pd
@@ -142,33 +142,48 @@ def variant_parse(
     for label in annotation_dict:
         if label == 'GTF':
             for col in ['Gene_id', 'Transcript_id', 'Gene_name', 'Gene_type', 'Gene_feature', 'Feature_no']:
-                header_dict[col] = defaultdict(list)
+                header_dict[col] = {}  # defaultdict(list)
             _intersect = merged_bed.intersect(annotation_dict[label], wa=True, wb=True)
             for line in _intersect:
                 line = list(line)
                 gene_id = line[7].split('/')[0]
-                header_dict['Gene_id'][line[3]].append(gene_id)
-                header_dict['Transcript_id'][line[3]].append(line[7].split('/')[1])
-                header_dict['Gene_name'][line[3]].append(gene_info_dict[gene_id].split('/')[0] + ';')
-                header_dict['Gene_type'][line[3]].append(gene_info_dict[gene_id].split('/')[1])
-                header_dict['Gene_feature'][line[3]].append(line[7].split('/')[2])
-                header_dict['Feature_no'][line[3]].append(line[7].split('/')[3])
+                ident = line[3][:20]  # As collasped string ID too long, use the first 20 characters as ID
+                if ident not in header_dict['Gene_id']:
+                    header_dict['Gene_id'][ident] = []
+                    header_dict['Gene_id'][ident].append(gene_id)
+                    header_dict['Transcript_id'][ident] = []
+                    header_dict['Transcript_id'][ident].append(line[7].split('/')[1])
+                    header_dict['Gene_name'][ident] = []
+                    header_dict['Gene_name'][ident].append(gene_info_dict[gene_id].split('/')[0] + ';')
+                    header_dict['Gene_type'][ident] = []
+                    header_dict['Gene_type'][ident].append(gene_info_dict[gene_id].split('/')[1])
+                    header_dict['Gene_feature'][ident] = []
+                    header_dict['Gene_feature'][ident].append(line[7].split('/')[2])
+                    header_dict['Feature_no'][ident] = []
+                    header_dict['Feature_no'][ident].append(line[7].split('/')[3])
+                else:
+                    header_dict['Gene_id'][ident].append(gene_id)
+                    header_dict['Transcript_id'][ident].append(line[7].split('/')[1])
+                    header_dict['Gene_name'][ident].append(gene_info_dict[gene_id].split('/')[0] + ';')
+                    header_dict['Gene_type'][ident].append(gene_info_dict[gene_id].split('/')[1])
+                    header_dict['Gene_feature'][ident].append(line[7].split('/')[2])
+                    header_dict['Feature_no'][ident].append(line[7].split('/')[3])
         else:
-            header_dict[label] = defaultdict(list)
+            header_dict[label] = {}  # defaultdict(list)
             _intersect = merged_bed.intersect(annotation_dict[label], wa=True, wb=True)
             for line in _intersect:
                 line = list(line)
-                header_dict[label][line[3]].append(line[7])
+                header_dict[label][line[3][:20]].append(line[7])
 
     # Filter merged bed
     print('Filtering merged variants')
     logging.info('Filtering merged variants')
     for filt in filter_dict:
-        header_dict[filt] = defaultdict(list)
+        header_dict[filt] = {}  # defaultdict(list)
         _intersect = merged_bed.intersect(filter_dict[filt], wa=True)
         for line in _intersect:
             line = list(line)
-            header_dict[filt][line[3]] = ['1']
+            header_dict[filt][line[3][:20]] = ['1']
 
     # Organize all data into master dataframe
     print('Generating dataframe')
@@ -197,7 +212,7 @@ def variant_parse(
         header_list['Start'].append(sv[1])
         header_list['End'].append(sv[2])
         for header in label_col + filter_col:
-            header_list[header].append('/'.join(list(set(header_dict[header][sv[3]]))[0:no_annotate_cap]))
+            header_list[header].append('/'.join(list(set(header_dict[header][sv[3][:20]]))[0:no_annotate_cap]))
         df = pd.concat([df, _df])  # Update main df
         sv_type = '/'.join(sorted(set(sv_type)))
         rank = 0
@@ -207,14 +222,14 @@ def variant_parse(
                 annote = []
                 for label in annotation_dict:
                     if label == 'GTF':
-                        annote.append('/'.join(list(set(header_dict['Gene_name'][sv[3]]))[0:no_annotate_cap]))
+                        annote.append('/'.join(list(set(header_dict['Gene_name'][sv[3][:20]]))[0:no_annotate_cap]))
                     else:
-                        annote.append('/'.join(list(set(header_dict[label][sv[3]]))[0:no_annotate_cap]))
+                        annote.append('/'.join(list(set(header_dict[label][sv[3][:20]]))[0:no_annotate_cap]))
                 annote = [g for g in annote if g != '']
                 annote = '/'.join(annote).strip(', ').replace(';', '')
                 _filter = []
                 for filt in filter_dict:
-                    if header_dict[filt][sv[3]] == ['1']:
+                    if header_dict[filt][sv[3][:20]] == ['1']:
                         _filter.append(filt + ': HIT')
                     else:
                         _filter.append(filt + ': MISS')
