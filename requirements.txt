@@ -1,6 +1,6 @@
 fastcluster==1.1.26
 numexpr==2.7.1
-numpy==1.18.3
+numpy==1.22.0
 pandas==1.0.3
 pybedtools==0.8.1
 pysam==0.15.4
